@@ -1,6 +1,5 @@
 package by.paulouskaya.task3.entity;
 
-import by.paulouskaya.task3.entity.Car.CarState;
 import by.paulouskaya.task3.util.CarGeneratorId;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -8,40 +7,39 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Car extends Thread {
-  private static final Logger logger = LogManager.getLogger();
-  
+	private static final Logger logger = LogManager.getLogger();
+
 	private long carId;
 	private static final CarGeneratorId generatorId = new CarGeneratorId();
 	private CarType carType;
 	private CarState carState;
 	private double carWeight;
 	private double carArea;
-	
+
 	public enum CarType {
-		PASSENGER(2.0, 8.0), 
-    LORRY(15.0, 25.0); 
-    
-    private final double defaultWeight;
-    private final double defaultArea;
-    
-    CarType(double weight, double area) {
-        this.defaultWeight = weight;
-        this.defaultArea = area;
-    }
-    
-    public double getDefaultWeight() {
-        return defaultWeight;
-    }
-    
-    public double getDefaultArea() {
-        return defaultArea;
-    }
+		PASSENGER(2.0, 8.0), LORRY(15.0, 25.0);
+
+		private final double defaultWeight;
+		private final double defaultArea;
+
+		CarType(double weight, double area) {
+			this.defaultWeight = weight;
+			this.defaultArea = area;
+		}
+
+		public double getDefaultWeight() {
+			return defaultWeight;
+		}
+
+		public double getDefaultArea() {
+			return defaultArea;
+		}
 	}
-	
+
 	public enum CarState {
 		NEW, PROCESSING, WAITING, FINISHED
 	}
-	
+
 	public Car(CarType type) {
 		this.carId = generatorId.generateId();
 		this.carType = type;
@@ -74,13 +72,13 @@ public class Car extends Thread {
 	public double getCarArea() {
 		return carArea;
 	}
-	
+
 	@Override
 	public void run() {
 		this.setState(CarState.PROCESSING);
 		long carId = this.getCarId();
 		logger.info("Ferry started processing car {}", carId);
-		
+
 		long timeSleeping = ThreadLocalRandom.current().nextLong(1000, 5001);
 		try {
 			TimeUnit.MILLISECONDS.sleep(timeSleeping);
@@ -88,9 +86,9 @@ public class Car extends Thread {
 			logger.error("Caught an exception {}", e.getMessage());
 			Thread.currentThread().interrupt();
 		}
-		
+
 		this.setState(CarState.FINISHED);
 		logger.info("Ferry finished processing car {}", carId);
-	}	
-	
+	}
+
 }
