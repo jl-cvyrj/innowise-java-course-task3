@@ -1,5 +1,6 @@
 package by.paulouskaya.task3.entity;
 
+import by.paulouskaya.task3.entity.Car.CarState;
 import by.paulouskaya.task3.util.CarGeneratorId;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -7,10 +8,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Car extends Thread {
-	
+  private static final Logger logger = LogManager.getLogger();
+  
 	private long carId;
 	private static final CarGeneratorId generatorId = new CarGeneratorId();
-  private static final Logger logger = LogManager.getLogger();
 	private CarType carType;
 	private CarState carState;
 	private double carWeight;
@@ -38,7 +39,7 @@ public class Car extends Thread {
 	}
 	
 	public enum CarState {
-		NEW, PROCESSING, FINISHED
+		NEW, PROCESSING, WAITING, FINISHED
 	}
 	
 	public Car(CarType type) {
@@ -65,16 +66,19 @@ public class Car extends Thread {
 	public void setState(CarState state) {
 		this.carState = state;
 	}
+
+	public double getCarWeight() {
+		return carWeight;
+	}
+
+	public double getCarArea() {
+		return carArea;
+	}
 	
 	@Override
 	public void run() {
-		//RiverFerry ferry = RiverFerry.getInstance();
-		
-	}
-	
-	public void prosess (Car car) {
-		car.setState(CarState.PROCESSING);
-		long carId = car.getCarId();
+		this.setState(CarState.PROCESSING);
+		long carId = this.getCarId();
 		logger.info("Ferry started processing car {}", carId);
 		
 		long timeSleeping = ThreadLocalRandom.current().nextLong(1000, 5001);
@@ -85,7 +89,8 @@ public class Car extends Thread {
 			Thread.currentThread().interrupt();
 		}
 		
-		car.setState(CarState.FINISHED);
+		this.setState(CarState.FINISHED);
 		logger.info("Ferry finished processing car {}", carId);
-	}
+	}	
+	
 }
