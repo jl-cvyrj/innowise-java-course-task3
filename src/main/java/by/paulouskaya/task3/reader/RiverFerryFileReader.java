@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface RiverFerryFileReader {
 	
-	public static final String CAR_INFO_REGEX = "=";
+	public static final String FILEPATH = "src/main/resources/input.txt";
 	public List<String> readCarInformationFromFile(String filename);
 }

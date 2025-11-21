@@ -16,14 +16,14 @@ public class RiverFerryFileReaderImpl implements RiverFerryFileReader{
 
 	@Override
 	public List<String> readCarInformationFromFile(String filename) {
-		List<String> lines = new ArrayList<>();
-		try {
-			lines = Files.readAllLines(Paths.get("my_file.txt"));
-		} catch (IOException e) {
-			logger.error("Error reading information from file {}", filename);
-			e.printStackTrace();
-		}
-		return lines;
+	    List<String> lines = new ArrayList<>();
+	    try {
+	        lines = Files.readAllLines(Paths.get(filename));
+	        logger.info("Information was read successfully from file {}", filename);
+	    } catch (IOException e) {
+	        logger.error("Error reading information from file {}", filename, e);
+	        Thread.currentThread().interrupt();
+	    }
+	    return lines;
 	}
-
 }
