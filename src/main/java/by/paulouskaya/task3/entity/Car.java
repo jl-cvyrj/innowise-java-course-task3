@@ -10,11 +10,19 @@ public class Car extends Thread {
 	private static final Logger logger = LogManager.getLogger();
 
 	private long carId;
-	private static final CarGeneratorId generatorId = new CarGeneratorId();
 	private CarType carType;
 	private CarState carState;
 	private double carWeight;
 	private double carArea;
+	
+	public Car(CarType type) {
+		this.carId = CarGeneratorId.generateId();
+		this.carType = type;
+		this.carState = CarState.NEW;
+		this.carWeight = type.defaultWeight;
+		this.carArea = type.defaultArea;
+		logger.info("Created car: ID={}, Type={}, Weight={}t, Area={}m²", carId, carType, carWeight, carArea);
+	}
 
 	public enum CarType {
 		PASSENGER(2.0, 8.0), LORRY(15.0, 25.0);
@@ -37,16 +45,7 @@ public class Car extends Thread {
 	}
 
 	public enum CarState {
-		NEW, PROCESSING, WAITING, FINISHED
-	}
-
-	public Car(CarType type) {
-		this.carId = generatorId.generateId();
-		this.carType = type;
-		this.carState = CarState.NEW;
-		this.carWeight = type.defaultWeight;
-		this.carArea = type.defaultArea;
-		logger.info("Created car: ID={}, Type={}, Weight={}t, Area={}m²", carId, carType, carWeight, carArea);
+		NEW, STARTED, PROCESSING, WAITING, FINISHED
 	}
 
 	public long getCarId() {
@@ -75,12 +74,13 @@ public class Car extends Thread {
 
 	@Override
 	public void run() {
-		this.setState(CarState.PROCESSING);
-		long carId = this.getCarId();
-		logger.info("Ferry started processing car {}", carId);
-
-		long timeSleeping = ThreadLocalRandom.current().nextLong(1000, 5001);
+		RiverFerry ferry = RiverFerry.getInstance();
 		try {
+			ferry.process(this);
+			this.setState(CarState.STARTED);
+			long carId = this.getCarId();
+			logger.info("Ferry started processing car {}", carId);
+			long timeSleeping = ThreadLocalRandom.current().nextLong(1000, 5001);
 			TimeUnit.MILLISECONDS.sleep(timeSleeping);
 		} catch (InterruptedException e) {
 			logger.error("Caught an exception {}", e.getMessage());
